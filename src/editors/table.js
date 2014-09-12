@@ -41,19 +41,19 @@ JSONEditor.defaults.editors.table = JSONEditor.defaults.editors.array.extend({
     // Determine the default value of array element
     var tmp = this.getElementEditor(0,true);
     this.item_default = tmp.getDefault();
-    this.width = tmp.getNumColumns();
+    this.width = tmp.getNumColumns() + 2;
     
     if(!this.options.compact) {
       this.title = this.theme.getHeader(this.getTitle());
       this.container.appendChild(this.title);
       this.title_controls = this.theme.getHeaderButtonHolder();
       this.title.appendChild(this.title_controls);
-      this.panel = this.theme.getIndentedPanel();
-      this.container.appendChild(this.panel);
       if(this.schema.description) {
         this.description = this.theme.getDescription(this.schema.description);
-        this.panel.appendChild(this.description);
+        this.container.appendChild(this.description);
       }
+      this.panel = this.theme.getIndentedPanel();
+      this.container.appendChild(this.panel);
       this.error_holder = document.createElement('div');
       this.panel.appendChild(this.error_holder);
     }

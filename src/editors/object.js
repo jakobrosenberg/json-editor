@@ -71,7 +71,8 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
     
     if(this.format === 'grid') {
       var rows = [];
-      $each(this.editors, function(key,editor) {
+      $each(this.property_order, function(j,key) {
+        var editor = self.editors[key];
         if(editor.property_removed) return;
         var found = false;
         var width = editor.options.hidden? 0 : editor.getNumColumns();
@@ -153,7 +154,8 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
     // Normal layout
     else {
       container = document.createElement('div');
-      $each(this.editors, function(key,editor) {
+      $each(this.property_order, function(i,key) {
+        var editor = self.editors[key];
         if(editor.property_removed) return;
         var row = self.theme.getGridRow();
         container.appendChild(row);
@@ -230,11 +232,16 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
     else {
       this.defaultProperties = this.schema.defaultProperties || Object.keys(this.schema.properties);
 
+      // Increase the grid width to account for padding
+      self.maxwidth += 1;
+
       $each(this.defaultProperties, function(i,key) {
         self.addObjectProperty(key, true, true);
 
-        self.minwidth = Math.max(self.minwidth,self.editors[key].getNumColumns());
-        self.maxwidth += self.editors[key].getNumColumns();
+        if(self.editors[key]) {
+          self.minwidth = Math.max(self.minwidth,self.editors[key].getNumColumns());
+          self.maxwidth += self.editors[key].getNumColumns();
+        }
       });
     }
     
@@ -323,7 +330,7 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
         e.stopPropagation();
         if(self.addproperty_input.value) {
           if(self.editors[self.addproperty_input.value]) {
-            alert('there is already a property with that name');
+            window.alert('there is already a property with that name');
             return;
           }
           
@@ -490,7 +497,7 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
       this.hideEditJSON();
     }
     catch(e) {
-      alert('invalid JSON');
+      window.alert('invalid JSON');
       throw e;
     }
   },
@@ -580,6 +587,10 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
     }
     // New property
     else {
+      if(!this.canHaveAdditionalProperties() && (!this.schema.properties || !this.schema.properties[name])) {
+        return;
+      }
+
       var schema = self.getPropertySchema(name);
       
             
@@ -683,7 +694,7 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
         if(!this.addproperty_checkboxes[i].checked) show_modal = true;
       }
       else if(!(i in this.editors)) {
-        if(!can_add) {
+        if(!can_add  && !this.schema.properties.hasOwnProperty(i)) {
           this.addproperty_checkboxes[i].disabled = true;
         }
         else {
@@ -740,10 +751,10 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
     value = value || {};
     
     if(typeof value !== "object" || Array.isArray(value)) value = {};
-    
+
     // First, set the values for all of the defined properties
     $each(this.cached_editors, function(i,editor) {
-      // Value explicitly set   
+      // Value explicitly set
       if(typeof value[i] !== "undefined") {
         self.addObjectProperty(i);
         editor.setValue(value[i],initial);
@@ -757,16 +768,13 @@ JSONEditor.defaults.editors.object = JSONEditor.AbstractEditor.extend({
         editor.setValue(editor.getDefault(),initial);
       }
     });
-    
-    // If additional properties are allowed, create the editors for any of those
-    if(this.canHaveAdditionalProperties()) {
-      $each(value, function(i,val) {
-        if(!self.cached_editors[i]) {
-          self.addObjectProperty(i);
-          self.editors[i].setValue(val,initial);
-        }
-      });
-    }
+
+    $each(value, function(i,val) {
+      if(!self.cached_editors[i]) {
+        self.addObjectProperty(i);
+        if(self.editors[i]) self.editors[i].setValue(val,initial);
+      }
+    });
     
     this.refreshValue();
     this.notify();

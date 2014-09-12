@@ -35,7 +35,8 @@ module.exports = function(grunt) {
           'src/editors/select.js',
           'src/editors/multiselect.js',
           'src/editors/base64.js',
-          
+          'src/editors/upload.js',
+
           // All the themes and iconlibs
           'src/theme.js',
           'src/themes/*.js',
@@ -73,6 +74,14 @@ module.exports = function(grunt) {
       }
     },
     jshint: {
+      options: {
+        browser: true,
+        indent: 2,
+        nonbsp: true,
+        nonew: true,
+        immed: true,
+        latedef: true
+      },
       beforeconcat: [
         'src/class.js',
         'src/ie9.js',
@@ -105,9 +114,14 @@ module.exports = function(grunt) {
         // Wrapper for $.fn style initialization
         'src/jquery.js'
       ],
-      afterconcat: [
-        'dist/jsoneditor.js'
-      ]
+      afterconcat: {
+        options: {
+          undef: true
+        },
+        files: {
+          src: ['dist/jsoneditor.js']
+        }
+      }
     }
   });
 

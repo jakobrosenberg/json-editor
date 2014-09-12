@@ -30,7 +30,7 @@ JSONEditor.AbstractEditor = Class.extend({
     
     this.theme = this.jsoneditor.theme;
     this.template_engine = this.jsoneditor.template;
-    this.iconlib = this.jsoneditor.inonlib;
+    this.iconlib = this.jsoneditor.iconlib;
     
     this.original_schema = options.schema;
     this.schema = this.jsoneditor.expandSchema(this.original_schema);
@@ -270,6 +270,8 @@ JSONEditor.AbstractEditor = Class.extend({
       vars = $extend(this.getWatchedFieldValues(),{
         key: this.key,
         i: this.key,
+        i0: (this.key*1),
+        i1: (this.key*1+1),
         title: this.getTitle()
       });
       var header_text = this.header_template(vars);
@@ -414,7 +416,7 @@ JSONEditor.AbstractEditor = Class.extend({
       throw "getOption is deprecated";
     }
     catch(e) {
-      console.error(e);
+      window.console.error(e);
     }
     
     return this.options[key];
