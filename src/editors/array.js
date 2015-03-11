@@ -338,6 +338,7 @@ JSONEditor.defaults.editors.array = JSONEditor.AbstractEditor.extend({
     self.active_tab = new_active_tab;
 
     self.refreshValue(initial);
+    self.refreshTabs(true);
     self.refreshTabs();
 
     self.onChange();
@@ -360,7 +361,7 @@ JSONEditor.defaults.editors.array = JSONEditor.AbstractEditor.extend({
       
       $each(this.rows,function(i,editor) {
         // Hide the move down button for the last row
-        if(editor.movedown_buttons) {
+        if(editor.movedown_button) {
           if(i === self.rows.length - 1) {
             editor.movedown_button.style.display = 'none';
           }

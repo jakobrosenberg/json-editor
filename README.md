@@ -188,7 +188,7 @@ Instead of getting/setting the value of the entire editor, you can also work on 
 // Get a reference to a node within the editor
 var name = editor.getEditor('root.name');
 
-// name will be null if the path is invalid
+// `getEditor` will return null if the path is invalid
 if(name) {
   name.setValue("John Smith");
   
@@ -199,7 +199,9 @@ if(name) {
 
 ### Validate
 
-When feasible, JSON Editor won't let users enter invalid data.
+When feasible, JSON Editor won't let users enter invalid data.  This is done by 
+using input masks and intelligently enabling/disabling controls.
+
 However, in some cases it is still possible to enter data that doesn't validate against the schema.
 
 You can use the `validate` method to check if the data is valid or not.
@@ -277,7 +279,7 @@ if(editor.isEnabled()) alert("It's editable!");
 
 ### Destroy
 
-This removes the editor HTML from the DOM and frees up memory.
+This removes the editor HTML from the DOM and frees up resources.
 
 ```javascript
 editor.destroy();
@@ -423,7 +425,7 @@ Show a video preview (using HTML5 video)
 }
 ```
 
-The `href` property is a template that gets re-evaluated everytime the value changes.
+The `href` property is a template that gets re-evaluated every time the value changes.
 The variable `self` is always available.  Look at the __Dependencies__ section below for how to include other fields or use a custom template engine.
 
 ### Property Ordering
@@ -495,7 +497,6 @@ JSON Editor uses HTML5 input types, so some of these may render as basic text in
 *  datetime
 *  datetime-local
 *  email
-*  hidden
 *  month
 *  number
 *  range
@@ -534,6 +535,12 @@ __SCEditor__ provides WYSIWYG editing of HTML and BBCode.  To use it, set the fo
     "wysiwyg": true
   }
 }
+```
+
+You can configure SCEditor by setting configuration options in `JSONEditor.plugins.sceditor`.  Here's an example:
+
+```js
+JSONEditor.plugins.sceditor.emoticonsEnabled = false;
 ```
 
 __EpicEditor__ is a simple Markdown editor with live preview.  To use it, set the format to `markdown`:
@@ -626,6 +633,17 @@ You can override the default Ace theme by setting the `JSONEditor.plugins.ace.th
 JSONEditor.plugins.ace.theme = 'twilight';
 ```
 
+#### Booleans
+
+The default boolean editor is a select box with options "true" and "false".  To use a checkbox instead, set the format to `checkbox`.
+
+```json
+{
+  "type": "boolean",
+  "format": "checkbox"
+}
+```
+
 #### Arrays
 
 The default array editor takes up a lot of screen real estate.  The `table` and `tabs` formats provide more compact UIs for editing arrays.
@@ -709,7 +727,13 @@ Editors can accept options which alter the behavior in some way.
 *  `disable_collapse` - If set to true, the collapse button will be hidden (works for objects and arrays)
 *  `disable_edit_json` - If set to true, the Edit JSON button will be hidden (works for objects)
 *  `disable_properties` - If set to true, the Edit Properties button will be hidden (works for objects)
+*  `enum_titles` - An array of display values to use for select box options in the same order as defined with the `enum` keyword. Works with schema using enum values.
+*  `expand_height` - If set to true, the input will auto expand/contract to fit the content.  Works best with textareas.
+*  `grid_columns` - Explicitly set the number of grid columns (1-12) for the editor if it's within an object using a grid layout.
 *  `hidden` - If set to true, the editor will not appear in the UI (works for all types)
+*  `input_height` - Explicitly set the height of the input element. Should be a valid CSS width string (e.g. "100px").  Works best with textareas.
+*  `input_width` - Explicitly set the width of the input element. Should be a valid CSS width string (e.g. "100px").  Works for string, number, and integer data types.
+*  `remove_empty_properties` - If set to true for an object, empty object properties (i.e. those with falsy values) will not be returned by getValue().
 
 ```json
 {
@@ -953,7 +977,7 @@ also make it work with an array of objects.  Here's an example:
       "enumSource": [{
         "source": "colors",
         "value": "{{item.text}}"
-      ]}
+      }]
     }
   }
 }
